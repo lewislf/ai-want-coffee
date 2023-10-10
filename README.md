@@ -50,7 +50,7 @@ Para implementar essa rede neural, serão necessários dados de treinamento cont
 
 - Como transpor o passo-a-passo na tela do VR identificando cada etapa já feita? Como identificar que a chaleira está cheia de água (metálica)? Identificar o ponto de fervura por turbulência na água ou timer? Os objetos estarão a vista ou dentro de armários/gavetas?
 
-- Object tracking on VR (ele está pegando o Casting from the Quest Pro to a pc, running object detection on the pc screen, then sending the results back to the quest pro), aparentemente não é possível    - https://twitter.com/ConcreteSciFi/status/1691448787821375489 // https://www.youtube.com/watch?v=bsVRoffcqJA&ab_channel=ZackQattan
+- Object tracking on VR (ele está pegando o Casting from the Quest Pro to a pc, running object detection on the pc screen, then sending the results back to the quest pro), aparentemente não é possível ter acesso direto a camera - https://twitter.com/ConcreteSciFi/status/1691448787821375489 // https://www.youtube.com/watch?v=bsVRoffcqJA&ab_channel=ZackQattan
 
 - AR/VR Guide (https://github.com/mikeroyal/AR-VR-Guide)
 
