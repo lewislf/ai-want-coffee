@@ -44,6 +44,16 @@ Esses passos são fundamentais para que a rede neural possa orientar o processo 
 
 Para implementar essa rede neural, serão necessários dados de treinamento contendo diferentes cenários de cozinhas e objetos. Além disso, um treinamento robusto com uma quantidade significativa de dados é essencial para garantir a precisão na identificação dos objetos e na orientação do processo de fazer café.
 
+- Como conectar o META-QUEST pro (oculus vr) com um dispositivo externo p/ rodar o script .py dentro da simulação p/ trackear e identificar os objetos?
+
+- Como identificar a mão do jogador p/ pegar objetos no ambiente simulado?  (https://www.youtube.com/watch?v=Yveg_dqBs34&ab_channel=TricksTipsFix)
+
+- Como transpor o passo-a-passo na tela do VR identificando cada etapa já feita? Como identificar que a chaleira está cheia de água (metálica)? Identificar o ponto de fervura por turbulência na água ou timer? Os objetos estarão a vista ou dentro de armários/gavetas?
+
+- Object tracking on VR (ele está pegando o Casting from the Quest Pro to a pc, running object detection on the pc screen, then sending the results back to the quest pro), aparentemente não é possível    - https://twitter.com/ConcreteSciFi/status/1691448787821375489 // https://www.youtube.com/watch?v=bsVRoffcqJA&ab_channel=ZackQattan
+
+- AR/VR Guide (https://github.com/mikeroyal/AR-VR-Guide)
+
 ### Personalização do Guia de Preparo:
 
 A rede neural pode ser projetada para permitir personalizações para atender às necessidades individuais dos usuários, como café sem açucar, mais amargo, mais fraco, etc..
