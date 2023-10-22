@@ -48,4 +48,5 @@ pip install torch==1.10.1+cu113 torchvision==0.11.2+cu113 torchaudio===0.10.1+cu
 # Navigate to the ai-want-coffee repository and execute the following:
 python predict.py
 # Note: You may need to change the filename in the script to match the video you want to analyze.
+Ou use diretamente o "yolo predict"
 ```
