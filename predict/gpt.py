@@ -18,12 +18,12 @@ task = ""  # Declare the task variable globally
 show_timer = False
 timer_countdown = 5
 
-ip_address = "rtsp://192.168.0.106:8080/h264_ulaw.sdp"
+ip_address = "rtsp://ip:port/h264_ulaw.sdp"
 ########################################################################################################################
 ########################################################################################################################
 
 def analyze_frame(frame_count):
-    image_path = f"D:/Users/meraki/Depurador/GPT/lcad/Project/capturas/passo_{frame_count}.jpg"
+    image_path = f"path/to/your/capturas/passo_{frame_count}.jpg"
         
     response = request_description(task, image_path)
     print("response saiu")
@@ -62,7 +62,7 @@ def capture_webcam_frame(frame_count) -> np.ndarray:
         return None
 
     # Define the path to the folder where the captured frames will be saved
-    base_path = "D:/Users/meraki/Depurador/GPT/lcad/Project/capturas/"
+    base_path = "/path/to/yor/capturas/"
 
     # Create the folder if it doesn't exist
     if not os.path.exists(base_path):
@@ -127,12 +127,7 @@ def draw_text(text, height, width, frame):
         text_y = y + i * line_height
         cv2.putText(frame, line.strip(), (x, text_y), font, font_scale, color, thickness, cv2.LINE_AA)
 
-tasks_path = "D:/Users/meraki/Depurador/GPT/lcad/Project/tasks/"
-# Create the tasks folder if it doesn't exist
-if not os.path.exists(tasks_path):
-    os.makedirs(tasks_path)
-
-ip_address = "rtsp://192.168.15.153:8080/h264_ulaw.sdp"
+ip_address = "rtsp://ip:port/h264_ulaw.sdp"
 cap = cv2.VideoCapture(ip_address)  # O argumento 0 indica a primeira webcam disponível
 
 def show_image():
