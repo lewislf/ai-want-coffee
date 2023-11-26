@@ -184,6 +184,7 @@ def main():
         if user_response == "yes":
             history.append({'role': 'user', 'content': 'Passo concluído.'})
         elif user_response == "no":
+            armazenaTask = task
             validacao = False
             while not validacao:
                 task = 'Inicializando a captura de imagem...'
@@ -196,6 +197,7 @@ def main():
 
                 task = 'Analisando a imagem...'
                 show_timer = False
+                task = armazenaTask
                 
                 frame = capture_webcam_frame(frame_count)             
                 
