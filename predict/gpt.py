@@ -26,12 +26,9 @@ def analyze_frame(frame_count):
     image_path = f"path/to/your/capturas/passo_{frame_count}.jpg"
         
     response = request_description(task, image_path)
-    print("response saiu")
-    
-    print("Response: " + str(response))
 
     if response is not None:
-        print(response)
+        print("Response: " + str(response))
     else:
         print("Error in API request: None")
         response = "Analysis failed"
