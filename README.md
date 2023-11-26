@@ -1,6 +1,6 @@
 # Overview
 
-This project aims to create a neural network that guides the coffee-making process based on object identification in the kitchen. It uses YOLO for real-time object detection and LLAVA for further processing.
+This project aims to create a neural network that guides the coffee-making process based on object identification in the kitchen. It supposed to use YOLO for real-time object detection and LLAVA for further processing (actually using only GPT4-VISION-REVIEW).
 
 Table of Contents
 - Prerequisites
