@@ -18,12 +18,12 @@ task = ""  # Declare the task variable globally
 show_timer = False
 timer_countdown = 5
 
-ip_address = "rtsp://192.168.0.183:8080/h264_ulaw.sdp"
+ip_address = "rtsp://ip:porta/h264_ulaw.sdp"
 ########################################################################################################################
 ########################################################################################################################
 
 def analyze_frame(frame_count):
-    image_path = f"/home/julia/ai-want-coffee-main/capturas/passo_{frame_count}.jpg"
+    image_path = f"/path/to/your/folder/capturas/passo_{frame_count}.jpg"
         
     response = request_description(task, image_path)
 
@@ -59,7 +59,7 @@ def capture_webcam_frame(frame_count) -> np.ndarray:
         return None
 
     # Define the path to the folder where the captured frames will be saved
-    base_path = "/home/julia/ai-want-coffee-main/capturas/"
+    base_path = "/path/to/your/folder/capturas"
 
     # Create the folder if it doesn't exist
     if not os.path.exists(base_path):
