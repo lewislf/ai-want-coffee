@@ -1,32 +1,33 @@
 import cv2
 import os
-from api_key import OPENAI_API_KEY
-import openai
-from gpt4vision import request_description, set_pre_configuration, validate_task_img, validate_user_response, get_response
-from time import sleep
-from unidecode import unidecode
 import numpy as np
 import threading
+from time import sleep
+from unidecode import unidecode
+from api_key import OPENAI_API_KEY
+import openai
+from gpt4vision import (
+    request_description, set_pre_configuration, validate_task_img, 
+    validate_user_response, get_response
+)
 
 ########################################################################################################################
 ########################################################################################################################
 # Substitua 'sua-chave-de-api-aqui' pela sua chave de API da OpenAI
 openai.api_key = OPENAI_API_KEY
-
 history = set_pre_configuration()
 task = ""  # Declare the task variable globally
 show_timer = False
 timer_countdown = 5
-
-ip_address = "rtsp://192.168.0.183:8080/h264_ulaw.sdp"
+ip_address = "rtsp://ip:porta/h264_ulaw.sdp" # Substitua ip e porta pelo IP e porta da sua webcam
 ########################################################################################################################
 ########################################################################################################################
 
 def analyze_frame(frame_count):
-    image_path = f"/home/julia/ai-want-coffee-main/capturas/passo_{frame_count}.jpg"
-        
-    response = request_description(task, image_path)
+    script_dir = os.path.dirname(__file__)
+    image_path = os.path.join(script_dir, '..', f'CapturedImages/passo_{frame_count}.jpg') 
 
+    response = request_description(task, image_path)
     if response is not None:
         print("Response: " + str(response))
     else:
@@ -59,7 +60,8 @@ def capture_webcam_frame(frame_count) -> np.ndarray:
         return None
 
     # Define the path to the folder where the captured frames will be saved
-    base_path = "/home/julia/ai-want-coffee-main/capturas/"
+    script_dir = os.path.dirname(__file__)  
+    base_path = os.path.join(script_dir, '..', 'CapturedImages') 
 
     # Create the folder if it doesn't exist
     if not os.path.exists(base_path):
@@ -97,10 +99,7 @@ def draw_text(text, height, width, frame):
 
     # Define as variáveis para o texto
     font = cv2.FONT_HERSHEY_SIMPLEX
-    if(show_timer):
-        font_scale = 1
-    else:
-        font_scale = 0.5
+    font_scale = 1 if show_timer else 0.5
     thickness = 1
     color = (255, 255, 255)  # Branco
 
@@ -112,12 +111,9 @@ def draw_text(text, height, width, frame):
     text_height = len(lines) * line_height
     positional = 10
     text_width = max([cv2.getTextSize(line.strip(), font, font_scale, thickness)[0][0] for line in lines])
-    if(show_timer):
-        x = (width - text_width) // 2
-        y = (height - text_height) - positional
-    else:
-        x = (width - text_width) // 2
-        y = (height - text_height) - positional // 2
+    
+    x = (width - text_width) // 2
+    y = (height - text_height) - positional if show_timer else (height - text_height) - positional // 2
 
     for i, line in enumerate(lines):
         # Desenha cada linha do texto uma abaixo da outra
@@ -127,7 +123,6 @@ def draw_text(text, height, width, frame):
 cap = cv2.VideoCapture(ip_address)  # O argumento 0 indica a primeira webcam disponível
 
 def show_image():
-
     global cap
 
     # Verifica se a webcam foi aberta corretamente
@@ -164,15 +159,26 @@ def show_image():
     cap.release()
     cv2.destroyAllWindows()
 
+def clear_captured_images_directory():
+    directory = os.path.join(os.path.dirname(__file__), '..', 'CapturedImages')
+    if os.path.exists(directory):
+        for file in os.listdir(directory):
+            file_path = os.path.join(directory, file)
+            try:
+                if os.path.isfile(file_path):
+                    os.unlink(file_path)
+            except Exception as e:
+                print(e)
+
 def main():
+    clear_captured_images_directory()
     global history, task, timer_countdown, show_timer  # Access the global task variable
     frame_count = 1
 
     while True:    
         task = get_response(history)        
-        print("Tarefa atual: " + task)
+        print("\nTarefa atual: " + task)
         user_response = input("Você concluiu este passo? ").lower()
-        
         user_response = validate_user_response(user_response, task)        
         history.append({'role': 'user', 'content': user_response[1]})
         
@@ -181,6 +187,7 @@ def main():
         elif user_response[0] == "no":
             armazenaTask = task
             validacao = False
+            # print("Histórico: " + str(history)) # Debug
             while not validacao:
                 task = 'Inicializando a captura de imagem...'
                 sleep(3)
@@ -214,13 +221,11 @@ def main():
         else:
             print("Entrada inválida. Por favor, digite novamente.")
             
-        print("Histórico: " + str(history))
+        print("Histórico: " + str(history)) # Debug
 
 if __name__ == "__main__":
-    
     thread_show_image = threading.Thread(target=show_image)
     thread_show_image.start()
     main()
     thread_show_image.join()
-
     show_image()

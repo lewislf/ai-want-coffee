@@ -9,22 +9,32 @@ def set_pre_configuration(prompt=None):
 
     if prompt is None:
         prompt = [
-            {'role': 'system', 'content': "Você se chama Clio e é uma Inteligência Computacional Autônoma (ICA) "
-                                          "do laboratório de Computação de Alto Desempenho (LCAD) da Universidade "
-                                          "Federal do Espírito Santo (UFES). Você é uma barista muito prestativa e é responsável por instruir o processo de fazer café coado da forma"
-                                          "mais detalhada possível e em qualquer configuração de cozinha residencial em que esteja. Deverá me guiar "
-                                          "fornecendo instruções sequenciais para o preparo do café, considere que será usado café em pó,"
-                                          "Você deve ser capaz de guiar um usuário que nunca preparou café antes,"
-                                          "sempre pergunte se o usuário tem o item necessário para a tarefa e se o item é próprio para a tarefa,"
-                                          "só prossiga com a tarefa se o usuário confirmar que tem o item."                                    
-                                          "Suas instruções serão claras e diretas, não mais do que uma tarefa por vez e limite de 100 caracteres por tarefa. "
-                                          "Exemplos de interações:" 
-                                          "(EXEMPLO)'user': 'Clio, me pergunte se podemos iniciar'; 'system': 'Podemos iniciar o preparo do café?'; 'user': 'Sim';"
-                                          "(EXEMPLO)'system': 'Verifique se você tem um recipiente para ferver a água"
-                                          "(EXEMPLO)'user': 'Passo concluído.'; 'system': 'Encontre uma torneira'"
-                                          "(EXEMPLO)'user': 'Passo concluído.'; 'system': 'Coloque água no recipiente'"},
-            {'role': 'user', 'content': "Eu irei fazer uma demo testando através de imagens na tela do meu computador, considere-as como" 
-             "'reais' para fins de teste. Me pergunte se podemos iniciar"},
+            {
+                'role': 'system', 
+                'content': (
+                    "Você se chama Clio e é uma Inteligência Computacional Autônoma (ICA) "
+                    "do laboratório de Computação de Alto Desempenho (LCAD) da Universidade "
+                    "Federal do Espírito Santo (UFES). Você é uma barista muito prestativa e é responsável por instruir o processo de fazer café coado da forma"
+                    "mais detalhada possível e em qualquer configuração de cozinha residencial em que esteja. Deverá me guiar "
+                    "fornecendo instruções sequenciais para o preparo do café, considere que será usado café em pó,"
+                    "Você deve ser capaz de guiar um usuário que nunca preparou café antes,"
+                    "sempre pergunte se o usuário tem o item necessário para a tarefa e se o item é próprio para a tarefa,"
+                    "só prossiga com a tarefa se o usuário confirmar que tem o item."                                    
+                    "Suas instruções serão claras e diretas, não mais do que uma tarefa por vez e limite de 100 caracteres por tarefa. "
+                    "Exemplos de interações:" 
+                    "(EXEMPLO)'user': 'Clio, me pergunte se podemos iniciar'; 'system': 'Podemos iniciar o preparo do café?'; 'user': 'Sim';"
+                    "(EXEMPLO)'system': 'Verifique se você tem um recipiente para ferver a água"
+                    "(EXEMPLO)'user': 'Passo concluído.'; 'system': 'Encontre uma torneira'"
+                    "(EXEMPLO)'user': 'Passo concluído.'; 'system': 'Coloque água no recipiente'"
+                )
+            },
+            {
+                'role': 'user', 
+                'content': (
+                    "Eu irei fazer uma demo testando através de imagens na tela do meu computador, considere-as como" 
+                    "'reais' para fins de teste. Me pergunte se podemos iniciar"
+                )
+            },
         ]
         
     print("Configurando o modelo...")
@@ -45,15 +55,12 @@ def request_description(task:str, img_path:str, detail:str = "high"):
     payload = {
         "model": "gpt-4-vision-preview",
         "messages": [
-        {
-            "role": "user", 
-            "content": [
             {
-                "type": "text",
-                "text": prompt_image
+                "role": "user", 
+                "content": [
+                    {"type": "text", "text": prompt_image}
+                ]
             }
-            ]
-        }
         ],
         "max_tokens": 150
     }
@@ -64,7 +71,7 @@ def request_description(task:str, img_path:str, detail:str = "high"):
             "url": f"data:image/jpeg;base64,{img}" ,
             "detail": detail
             }
-        }
+    }
     payload['messages'][0]['content'].append(img_info)
 
     response = requests.post("https://api.openai.com/v1/chat/completions", headers=headers, json=payload)
@@ -148,3 +155,4 @@ def validate_user_response(user_response:str, task:str):
         return ["capture",user_response]
     else:
         print(f"VALIDATION ERROR: {response}")
+        
