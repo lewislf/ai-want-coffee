@@ -5,6 +5,7 @@ import threading
 from time import sleep
 from unidecode import unidecode
 from api_key import OPENAI_API_KEY
+from api_key import LOCAL_CAMERA
 import openai
 from gpt4vision import *
 
@@ -16,7 +17,7 @@ history = set_pre_configuration()
 task = ""  # Declare the task variable globally
 show_timer = False
 timer_countdown = 5
-ip_address = "rtsp://ip:port/h264_ulaw.sdp" # Substitua ip e porta pelo IP e porta da sua webcam
+ip_address = LOCAL_CAMERA # Substitua ip e porta pelo IP e porta da sua webcam
 ########################################################################################################################
 ########################################################################################################################
 
