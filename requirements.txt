@@ -1,0 +1,4 @@
+opencv-python
+numpy
+unidecode
+openai==0.28
