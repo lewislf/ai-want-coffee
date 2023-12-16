@@ -4,7 +4,7 @@
 <!-- <--!span><font size="5", > Efficient and Robust 2D-to-BEV Representation Learning via Geometry-guided Kernel Transformer
 </font></span> -->
 
-  Alefe Gadioli, Breno Angelo, Daniel Gobbi, Eduardo Abreu, Mariana Rezende e Matheus Rezende
+  Alefe Gadioli, Breno Angelo, Daniel Gobbi, Eduardo Abreu, Luiz Cardoso, Mariana Rezende e Matheus Rezende
 <!-- <a href="https://scholar.google.com/citations?user=pCY-bikAAAAJ&hl=zh-CN">Jinwei Yuan</a> -->
 <div><a href="https://arxiv.org/abs/2208.11434">[AI Want Coffee Report]</a></div> 
 
@@ -26,7 +26,7 @@ C. **Coffee-Agent v2:** This version seeks to solve problems from the previous a
 Tests were conducted in different kitchens, for testing in different scenarios using cameras and sending to the GPT. 
 
 ### Visualization  **adicionar imagens**
-<div align="center"><td><img src=data/sample_videos/cozinha01(1).gif/></td></div>
+<div align="center"><td><img src=data/sample_videos/video_demo.gif></td></div>
 
 # Installation
 ## 1. Prerequisites
