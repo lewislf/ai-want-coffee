@@ -1,34 +1,32 @@
 import cv2
 import os
-from api_key import OPENAI_API_KEY
-import openai
-from gpt4vision import request_description, set_pre_configuration, validate_task_img, validate_user_response, get_response
-from time import sleep
-from unidecode import unidecode
 import numpy as np
 import threading
+from time import sleep
+from unidecode import unidecode
+from api_key import OPENAI_API_KEY
+import openai
+from gpt4vision import *
 
 ########################################################################################################################
 ########################################################################################################################
-# Substitua 'sua-chave-de-api-aqui' pela sua chave de API da OpenAI
+# Variáveis globais
 openai.api_key = OPENAI_API_KEY
-
 history = set_pre_configuration()
 task = ""  # Declare the task variable globally
 show_timer = False
 timer_countdown = 5
-
-ip_address = "rtsp://ip:porta/h264_ulaw.sdp"
+ip_address = "rtsp://ip:port/h264_ulaw.sdp" # Substitua ip e porta pelo IP e porta da sua webcam
 ########################################################################################################################
 ########################################################################################################################
 
 def analyze_frame(frame_count):
-    image_path = f"/path/to/your/folder/capturas/passo_{frame_count}.jpg"
-        
-    response = request_description(task, image_path)
+    script_dir = os.path.dirname(__file__)
+    image_path = os.path.join(script_dir, '..', f'CapturedImages/passo_{frame_count}.jpg') 
 
+    response = request_description(task, image_path)
     if response is not None:
-        print("Response: " + str(response))
+        print("\nResponse: " + str(response))
     else:
         print("Error in API request: None")
         response = "Analysis failed"
@@ -59,7 +57,8 @@ def capture_webcam_frame(frame_count) -> np.ndarray:
         return None
 
     # Define the path to the folder where the captured frames will be saved
-    base_path = "/path/to/your/folder/capturas"
+    script_dir = os.path.dirname(__file__)  
+    base_path = os.path.join(script_dir, '..', 'CapturedImages') 
 
     # Create the folder if it doesn't exist
     if not os.path.exists(base_path):
@@ -97,10 +96,7 @@ def draw_text(text, height, width, frame):
 
     # Define as variáveis para o texto
     font = cv2.FONT_HERSHEY_SIMPLEX
-    if(show_timer):
-        font_scale = 1
-    else:
-        font_scale = 0.5
+    font_scale = 1 if show_timer else 0.5
     thickness = 1
     color = (255, 255, 255)  # Branco
 
@@ -112,12 +108,9 @@ def draw_text(text, height, width, frame):
     text_height = len(lines) * line_height
     positional = 10
     text_width = max([cv2.getTextSize(line.strip(), font, font_scale, thickness)[0][0] for line in lines])
-    if(show_timer):
-        x = (width - text_width) // 2
-        y = (height - text_height) - positional
-    else:
-        x = (width - text_width) // 2
-        y = (height - text_height) - positional // 2
+    
+    x = (width - text_width) // 2
+    y = (height - text_height) - positional if show_timer else (height - text_height) - positional // 2
 
     for i, line in enumerate(lines):
         # Desenha cada linha do texto uma abaixo da outra
@@ -127,7 +120,6 @@ def draw_text(text, height, width, frame):
 cap = cv2.VideoCapture(ip_address)  # O argumento 0 indica a primeira webcam disponível
 
 def show_image():
-
     global cap
 
     # Verifica se a webcam foi aberta corretamente
@@ -164,61 +156,99 @@ def show_image():
     cap.release()
     cv2.destroyAllWindows()
 
+def clear_captured_images_directory():
+    directory = os.path.join(os.path.dirname(__file__), '..', 'CapturedImages')
+    if os.path.exists(directory):
+        for file in os.listdir(directory):
+            file_path = os.path.join(directory, file)
+            try:
+                if os.path.isfile(file_path):
+                    os.unlink(file_path)
+            except Exception as e:
+                print(e)
+
 def main():
+    clear_captured_images_directory()
     global history, task, timer_countdown, show_timer  # Access the global task variable
     frame_count = 1
+    trying_new_task = False
 
-    while True:    
-        task = get_response(history)        
-        print("Tarefa atual: " + task)
+    while True:
+        if not trying_new_task:
+            task = get_response(history) 
+            print("\nTarefa atual: " + task)
+        trying_new_task = False
+
         user_response = input("Você concluiu este passo? ").lower()
-        
-        user_response = validate_user_response(user_response, task)        
-        history.append({'role': 'user', 'content': user_response})
-        
-        if user_response == "yes":
-            history.append({'role': 'user', 'content': 'Passo concluído.'})
-        elif user_response == "no":
-            armazenaTask = task
-            validacao = False
-            while not validacao:
-                task = 'Inicializando a captura de imagem...'
-                sleep(3)
-                print("Iniciando captura de imagem...")
-                show_timer = True
-                for i in range(3):
-                    timer_countdown = 3 - i
-                    sleep(0.75)
+        user_response = validate_user_response(user_response, task)  
 
-                task = 'Analisando a imagem...'
-                show_timer = False
-                task = armazenaTask
-                
-                frame = capture_webcam_frame(frame_count)             
-                
-                if frame is not None:    
-                    description = analyze_frame(frame_count)
-                    validacao = validate_task_img(description, task)
+        if user_response:      
+            # print("Histórico: " +  user_response[1]) # Debug
+            history.append({'role': 'user', 'content': user_response[1]})
+            
+            if "yes" in user_response[0]:
+                history.append({'role': 'user', 'content': 'Passo concluído.'})
+            elif "no" in user_response[0]:
+                armazenaTask = task
+                validacao = False
+                # print("Histórico: " + str(history)) # Debug
+            
+                while not validacao:
+                    # Pergunta se o usuário deseja capturar outra imagem ou tentar uma tarefa substituta
+                    user_response = input("\nTarefa não concluída.\nDeseja capturar uma imagem ou tentar uma tarefa substituta? ").lower()
+                    user_intent = validate_if_capture_or_substitute(user_response, task)
                     
-                    if validacao == False:
-                        task = 'Tarefa não concluída. Irei analisar mais uma vez.'
+                    # Enquanto a resposta do usuario nao for clara, o loop continua
+                    while "unclear" in user_intent[0]:
+                        user_response = input("Resposta não compreendida. Por favor, esclareça sua resposta.\nDeseja capturar outra imagem ou tentar uma tarefa substituta? ").lower()
+                        user_intent = validate_if_capture_or_substitute(user_response, task)
+
+                    # print("user_response[0] == " + str(user_response[0])) # Debug
+
+                    if "capture" in user_intent[0]:
+                        task = 'Inicializando a captura de imagem...'
                         sleep(3)
-                else:
-                    print("Failed to capture a valid frame.")
-        
-                frame_count += 1
+                        print("Iniciando captura de imagem...")
+                        show_timer = True
+                        for i in range(3):
+                            timer_countdown = 3 - i
+                            sleep(0.75)
+
+                        task = 'Analisando a imagem...'
+                        show_timer = False
+                        task = armazenaTask
+                        
+                        frame = capture_webcam_frame(frame_count)             
+                        
+                        if frame is not None:    
+                            description = analyze_frame(frame_count)
+                            validacao = validate_task_img(description, task)
+                        else:
+                            print("Failed to capture a valid frame.")
                 
-                # Lógica para processamento de imagem (não incluída aqui)
-                print("Processamento de imagem necessário.")
-            history.append({'role': 'user', 'content': 'Passo concluído.'})
+                        frame_count += 1
+                 
+                    # Se o usuário deseja tentar uma tarefa substituta, o loop é reiniciado com a nova tarefa
+                    elif"substitute" in user_intent[0]:
+                        new_task = get_equivalent_task(task) 
+                        task = new_task
+                        print("\n\nNova tarefa: " + task)
+                        trying_new_task = True
+                        break 
+                    else:
+                        print("Erro na validação da resposta do usuário.")
+                
+                history.append({'role': 'user', 'content': 'Passo concluído.'})
+            else:
+                print("Entrada inválida. Por favor, digite novamente.")
         else:
-            print("Entrada inválida. Por favor, digite novamente.")
+            print("Erro na validação da resposta do usuário. Por favor, tente novamente.")
+            
+        # print("Histórico: " + str(history)) # Debug
 
 if __name__ == "__main__":
-    
     thread_show_image = threading.Thread(target=show_image)
     thread_show_image.start()
     main()
     thread_show_image.join()
-
     show_image()
