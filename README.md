@@ -1,25 +1,52 @@
-# Overview
+<div align="center">
+<h1> AI Want Coffee: Using GPT to make coffee ☕ </h1>
 
-This project aims to create a neural network that guides the coffee-making process based on object identification in the kitchen. It supposed to use YOLO for real-time object detection and LLAVA for further processing (actually using only GPT4-VISION-REVIEW).
+<!-- <--!span><font size="5", > Efficient and Robust 2D-to-BEV Representation Learning via Geometry-guided Kernel Transformer
+</font></span> -->
 
-Table of Contents
-- Prerequisites
-- Clone the repository
-- Installation
-- Running the Prediction Script
+  Alefe Gadioli, Breno, Daniel, Eduardo, Mariana e Matheus Rezende
+<!-- <a href="https://scholar.google.com/citations?user=pCY-bikAAAAJ&hl=zh-CN">Jinwei Yuan</a> -->
+<div><a href="https://arxiv.org/abs/2208.11434">[AI Want Coffee Report]</a></div> 
+
+</div>
+
+# Introduction
+
+The 'AI Want Coffee' project assesses the potential of Artificial General Intelligence (AGI) using the 'Wozniak test', which challenges a robot to enter a house, make and serve coffee. It incorporates skills such as autonomous navigation and speech recognition. The focus is on testing OpenAI's GPT-4 model in real scenarios, exploring how its natural language processing and response generation can aid in developing AGI for complex tasks in unstructured environments.
+
+<div align="center"><a href="https://ibb.co/Xz1dsX3"><img src="https://i.ibb.co/7GPTWvR/Whats-App-Image-2023-12-16-at-00-18-04.jpg" alt="Whats-App-Image-2023-12-16-at-00-18-04" border="0"></a> </div>
+
+## Results
+Tests were conducted in different kitchens, for testing in different scenarios using cameras and sending to the GPT. 
+
+### Visualization  **adicionar imagens**
+<td><img src=data/demo/together_video.gif/></td>
 
 # Installation
 ## 1. Prerequisites
 
 - Make sure to install `GPU` drivers in your system if you want to use `GPU` .
-- Make sure you have [MS Build tools](https://aka.ms/vs/17/release/vs_BuildTools.exe) installed in system if using windows. 
-- [Download git for windows](https://git-scm.com/download/win) if not installed.
+- Python3
+- 
 
 ## 2. Clone the repository
 ``` shell
 # ai-want-coffee
-https://github.com/lewislf/ai-want-coffee.git
+git clone https://github.com/lewislf/ai-want-coffee.git
 ```
+
+## 2. Installation of the requirements:
+``` shell
+# Open the Folder
+cd ai-want-coffee
+```
+
+``` shell
+# Installation
+pip install -r requirements.txt
+```
+
+
 
 ## 3. Running the Prediction Script
 ```shell
