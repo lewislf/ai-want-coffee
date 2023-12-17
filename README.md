@@ -84,7 +84,7 @@ cd ai-want-coffee/predict/
 - In the terminal, execute python gpt.py
 ```shell
 # Navigate to the ai-want-coffee repository and execute the following:
-python3 gpt.py
+python3 assistant_gpt.py
 ```
 
 
