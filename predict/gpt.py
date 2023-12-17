@@ -4,88 +4,91 @@ import numpy as np
 import threading
 from time import sleep
 from unidecode import unidecode
-from api_key import OPENAI_API_KEY
+from api_key import OPENAI_API_KEY, LOCAL_CAMERA
 import openai
-from gpt4vision import (
-    request_description, set_pre_configuration, validate_task_img, 
-    validate_user_response, get_response
-)
+from gpt4vision import OpenAIManagement, VisionAssistant, RobotAIManager
 
-########################################################################################################################
-########################################################################################################################
-# Substitua 'sua-chave-de-api-aqui' pela sua chave de API da OpenAI
+
+# Classes
+openai_manager = OpenAIManagement(api_key= OPENAI_API_KEY)
+vision_assistant = VisionAssistant(api_key=OPENAI_API_KEY)
+robot_manager = RobotAIManager(api_key=OPENAI_API_KEY)
+
+
+# Global Variables
 openai.api_key = OPENAI_API_KEY
-history = set_pre_configuration()
-task = ""  # Declare the task variable globally
+history = []
+history = OpenAIManagement.set_pre_configuration()
+task = ""
 show_timer = False
 timer_countdown = 5
-ip_address = "rtsp://ip:porta/h264_ulaw.sdp" # Substitua ip e porta pelo IP e porta da sua webcam
-########################################################################################################################
-########################################################################################################################
+ip_address = LOCAL_CAMERA
+cap = cv2.VideoCapture(ip_address)
+
+
 
 def analyze_frame(frame_count):
     script_dir = os.path.dirname(__file__)
     image_path = os.path.join(script_dir, '..', f'CapturedImages/passo_{frame_count}.jpg') 
 
-    response = request_description(task, image_path)
+    response = OpenAIManagement.request_description(task, image_path)
     if response is not None:
-        print("Response: " + str(response))
+        print("\nResponse: " + str(response))
     else:
         print("Error in API request: None")
         response = "Analysis failed"
     return response
 
+
 def capture_webcam_frame(frame_count) -> np.ndarray:
-    """
-    Connects to the webcam IP, captures a unique frame, and returns the captured frame.
-    :param ip_address: IP address of the webcam.
-    :param task_name: Name of the current task to use in the filename.
-    :param frame_count: Frame count to ensure unique filenames.
-    :return: Captured frame as a numpy array.
-    """
     local_cap = cv2.VideoCapture(ip_address)
 
-    # Check if the connection was successful
     if not local_cap.isOpened():
         print("Failed to connect to webcam.")
         return None
 
-    # Capture a frame from the webcam
     ret, frame = local_cap.read()
 
-    # Check if the frame was captured successfully
     if not ret:
         print("Failed to capture frame.")
         local_cap.release()
         return None
 
-    # Define the path to the folder where the captured frames will be saved
     script_dir = os.path.dirname(__file__)  
     base_path = os.path.join(script_dir, '..', 'CapturedImages') 
 
-    # Create the folder if it doesn't exist
     if not os.path.exists(base_path):
         os.makedirs(base_path)
 
-    # Define the path to the file where the captured frame will be saved
     filename = os.path.join(base_path, f"passo_{frame_count}.jpg")
 
-    # Save the captured frame to the file
-    cv2.imwrite(filename, frame)
+    matrix = image_to_matrix(frame)
+    cv2.imwrite(filename, matrix) 
 
-    # Print the path to the saved file
     print(f"Frame saved to: {filename}")
     
     local_cap.release()
 
-    # Return the captured frame
     return frame
 
+
+def image_to_matrix(image):
+    gray_image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+
+    block_size = 10
+    block_color = 255
+    for i in range(0, gray_image.shape[0], block_size):
+        for j in range(0, gray_image.shape[1], block_size):
+            gray_image[i:i+block_size, j:j+block_size] = block_color
+
+    matrix = np.array(gray_image)
+
+    return matrix
+
+
 def draw_text(text, height, width, frame):
-    # Convert special characters to ASCII
     text = unidecode(text)
 
-    # Quebra o texto em uma lista de linhas com no máximo 30 caracteres
     words = text.split(' ')
     lines = []
     current_line = ''
@@ -97,17 +100,14 @@ def draw_text(text, height, width, frame):
             current_line = word
     lines.append(current_line)
 
-    # Define as variáveis para o texto
     font = cv2.FONT_HERSHEY_SIMPLEX
     font_scale = 1 if show_timer else 0.5
     thickness = 1
-    color = (255, 255, 255)  # Branco
+    color = (255, 255, 255)
 
-    # Calcula a altura do texto para posicionar as linhas na imagem
     text_size = cv2.getTextSize('Tg', font, font_scale, thickness)[0]
-    line_height = text_size[1] + 5  # Adiciona um pequeno espaço entre as linhas
+    line_height = text_size[1] + 5
 
-    # Calcula a posição x e y para centralizar o texto na imagem
     text_height = len(lines) * line_height
     positional = 10
     text_width = max([cv2.getTextSize(line.strip(), font, font_scale, thickness)[0][0] for line in lines])
@@ -116,31 +116,24 @@ def draw_text(text, height, width, frame):
     y = (height - text_height) - positional if show_timer else (height - text_height) - positional // 2
 
     for i, line in enumerate(lines):
-        # Desenha cada linha do texto uma abaixo da outra
         text_y = y + i * line_height
         cv2.putText(frame, line.strip(), (x, text_y), font, font_scale, color, thickness, cv2.LINE_AA)
 
-cap = cv2.VideoCapture(ip_address)  # O argumento 0 indica a primeira webcam disponível
 
 def show_image():
     global cap
 
-    # Verifica se a webcam foi aberta corretamente
     if not cap.isOpened():
-        print("Erro ao abrir a webcam.")
+        print("Failed to open webcam.")
         exit()
 
-    # Loop de captura de vídeo
     while True:
-        # Lê o próximo quadro da webcam
         ret, frame = cap.read()
 
-        # Verifica se o quadro foi lido corretamente
         if not ret:
-            print("Erro ao ler o quadro.")
+            print("Failed to read frame.")
             break
 
-        # Obter as dimensões da imagem
         height, width = frame.shape[:2]
 
         if show_timer:
@@ -148,16 +141,14 @@ def show_image():
         else:
             draw_text(task, height, width, frame)
 
-        # Exibe o quadro em uma janela
         cv2.imshow('Webcam com Texto', frame)
 
-        # Verifica se a tecla 'q' foi pressionada para encerrar o loop
         if cv2.waitKey(1) & 0xFF == ord('q'):
             break
 
-    # Libera os recursos quando o loop é encerrado
     cap.release()
     cv2.destroyAllWindows()
+
 
 def clear_captured_images_directory():
     directory = os.path.join(os.path.dirname(__file__), '..', 'CapturedImages')
@@ -170,58 +161,83 @@ def clear_captured_images_directory():
             except Exception as e:
                 print(e)
 
+
 def main():
     clear_captured_images_directory()
-    global history, task, timer_countdown, show_timer  # Access the global task variable
+
+    global history, task, timer_countdown, show_timer
     frame_count = 1
+    trying_new_task = False
 
-    while True:    
-        task = get_response(history)        
-        print("\nTarefa atual: " + task)
-        user_response = input("Você concluiu este passo? ").lower()
-        user_response = validate_user_response(user_response, task)        
-        history.append({'role': 'user', 'content': user_response[1]})
-        
-        if user_response[0] == "yes":
-            history.append({'role': 'user', 'content': 'Passo concluído.'})
-        elif user_response[0] == "no":
-            armazenaTask = task
-            validacao = False
-            # print("Histórico: " + str(history)) # Debug
-            while not validacao:
-                task = 'Inicializando a captura de imagem...'
-                sleep(3)
-                print("Iniciando captura de imagem...")
-                show_timer = True
-                for i in range(3):
-                    timer_countdown = 3 - i
-                    sleep(0.75)
+    while True:
+        if not trying_new_task:
+            task = openai_manager.get_response(history) 
+            print("\nCurrent Task: " + task)
 
-                task = 'Analisando a imagem...'
-                show_timer = False
-                task = armazenaTask
-                
-                frame = capture_webcam_frame(frame_count)             
-                
-                if frame is not None:    
-                    description = analyze_frame(frame_count)
-                    validacao = validate_task_img(description, task)
-                    
-                    if validacao == False:
-                        task = 'Tarefa não concluída. Irei analisar mais uma vez.'
-                        sleep(3)
-                else:
-                    print("Failed to capture a valid frame.")
-        
-                frame_count += 1
-                
-                # Lógica para processamento de imagem (não incluída aqui)
-                print("Processamento de imagem necessário.")
-            history.append({'role': 'user', 'content': 'Passo concluído.'})
-        else:
-            print("Entrada inválida. Por favor, digite novamente.")
+        trying_new_task = False
+
+        print("\n", history)
+        user_input = input("Have you completed this step? ").lower()
+
+        user_response = vision_assistant.validate_task_img(user_input, task) 
+
+        if user_response:
+            if isinstance(user_response, tuple):
+                history.append({'role': 'user', 'content': user_response[1]})
+
+            if isinstance(user_response, tuple) and "yes" in user_response[0]:
+                history.append({'role': 'user', 'content': 'Step completed.'})
+            elif isinstance(user_response, tuple) and "no" in user_response[0]:
+                armazenaTask = task
+                validacao = False
             
-        print("Histórico: " + str(history)) # Debug
+                while not validacao:
+                    user_response = input("\nTask not completed.\nDo you want to capture an image or try a substitute task? ").lower()
+                    user_intent = vision_assistant.validate_if_capture_or_substitute(user_response, task)
+                    
+                    while "unclear" in user_intent[0]:
+                        user_response = input("Response not understood. Please clarify your response.\nDo you want to capture another image or try a substitute task? ").lower()
+                        user_intent = vision_assistant.validate_if_capture_or_substitute(user_response, task)
+
+                    if "capture" in user_intent[0]:
+                        task = 'Initializing image capture...'
+                        sleep(3)
+                        print("Initiating image capture...")
+                        show_timer = True
+                        
+                        for i in range(3):
+                            timer_countdown = 3 - i
+                            sleep(0.75)
+
+                        task = 'Analyzing image...'
+                        show_timer = False
+                        task = armazenaTask
+
+                        frame = capture_webcam_frame(frame_count) 
+                
+                        if frame is not None:    
+                            description = analyze_frame(frame_count)
+                            vision_assistant.validate_task_img(description, task)
+                        else:
+                            print("Failed to capture a valid frame.")
+                        
+                        frame_count += 1
+
+                        if "substitute" in user_intent[0]:
+                            new_task = vision_assistant.get_equivalent_task(task, description) 
+                            task = new_task
+                            print("\n\nNew Task: " + task)
+                            trying_new_task = True
+                            break 
+                        else:
+                            print("Error in validating user response.")
+                        
+                        history.append({'role': 'user', 'content': 'Step completed.'})
+                    else:
+                        print("Invalid input. Please try again.")
+                else:
+                    print("Error in validating user response. Please try again.")
+
 
 if __name__ == "__main__":
     thread_show_image = threading.Thread(target=show_image)
