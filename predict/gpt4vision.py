@@ -171,7 +171,7 @@ def validate_if_capture_or_substitute(user_response:str, task:str):
     prompt = f"""
     Com base na resposta do usuário e na tarefa fornecida, determine a intenção do usuário.
     Se a resposta do usuário sugerir o desejo de capturar uma imagem, classifique a resposta como 'capture'.
-    Se indicar a intenção de substituir o texto recebido, classifique-o como 'substitute'.
+    Se indicar a intenção de substituir o texto/tarefa recebido, classifique-o como 'substitute'.
     Se a intenção do usuário não estiver clara, classifique como 'unclear'.
     Tarefa: {task}
     Resposta do usuário: {user_response}

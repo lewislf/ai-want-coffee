@@ -1,0 +1,2 @@
+OPENAI_API_KEY = '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'
+LOCAL_CAMERA = "rtsp://192.168.10.37:8080/h264_ulaw.sdp" 
