@@ -81,7 +81,7 @@ LOCAL_CAMERA = "rtsp://ip:port/h264_ulaw.sdp"
 # ai-want-coffee/predict/
 cd ai-want-coffee/predict/
 ```
-- In the terminal, execute python gpt.py
+- In the terminal, execute python assistant_gpt.py
 ```shell
 # Navigate to the ai-want-coffee repository and execute the following:
 python3 assistant_gpt.py
