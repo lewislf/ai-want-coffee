@@ -1,2 +1,2 @@
-OPENAI_API_KEY = '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'
-LOCAL_CAMERA = "rtsp://192.168.15.72:8080/h264_ulaw.sdp" 
+OPENAI_API_KEY = 'YOUR KEY'
+LOCAL_CAMERA = "rtsp://ip:port/h264_ulaw.sdp" 
