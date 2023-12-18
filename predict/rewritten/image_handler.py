@@ -1,25 +1,26 @@
 import cv2
 import numpy as np
 import os
+import base64
 
 
 class ImageHandler():
     cap: cv2.VideoCapture
     
-    def __init__(self, cap: cv2.VideoCapture) -> None:
-        self.cap = cap
+    def __init__(self, ip_address: str) -> None:
+        self.cap = cv2.VideoCapture(ip_address)
     
     def show_webcam(self) -> None:
         while True:
             ret, frame = self.cap.read()
             if ret:
                 cv2.imshow('Webcam', frame)
-            if cv2.waitKey(1) & 0xFF == ord('q'):
+            if cv2.waitKey(10) & 0xFF == ord('q'):
                 break
         self.cap.release()
         cv2.destroyAllWindows()
 
-    def capture_webcam_frame(self, frame_count) -> str:
+    def capture_webcam_frame(self, frame_count):
         # Capture a frame from the webcam
         ret, frame = self.cap.read()
 
@@ -41,4 +42,8 @@ class ImageHandler():
         print(f"Frame saved to: {filename}")
         
         # Return the captured frame
-        return filename
+        return self.encode_image(filename)
+    
+    def encode_image(self, image_path: str):
+        with open(image_path, "rb") as image_file:
+            return base64.b64encode(image_file.read()).decode('utf-8')

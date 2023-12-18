@@ -1,12 +1,12 @@
 from openai import OpenAI
-import threading
+from multiprocessing import Process
 import argparse
 import cv2
 from agent import GPTVisionAgent
 from image_handler import ImageHandler
 
 
-system_prmpt = (
+system_prompt = (
     "Você se chama Clio e é uma Inteligência Computacional Autônoma (ICA) "
     "do laboratório de Computação de Alto Desempenho (LCAD) da Universidade "
     "Federal do Espírito Santo (UFES).\n"
@@ -26,14 +26,14 @@ system_prmpt = (
 
 
 def main(ip_address):
-    global system_prompt
     client = OpenAI()
-    coffee_assistant = GPTVisionAgent(system_prompt, "gpt-4-vision-preview")
-    cap = cv2.VideoCapture(ip_address)
-    img_handler = ImageHandler(cap)
+    coffee_assistant = GPTVisionAgent(system_prompt=system_prompt,
+                                      model="gpt-4-vision-preview",
+                                      image_history_rule='none')
+    img_handler = ImageHandler(ip_address)
 
-    thread_show_webcam = threading.Thread(target=img_handler.show_webcam)
-    thread_show_webcam.start()
+    process_show_webcam = Process(target=img_handler.show_webcam)
+    process_show_webcam.start()
 
     user_response = (
         "Eu irei fazer uma demo testando através de imagens na tela do meu computador, considere-as como" 
@@ -41,13 +41,13 @@ def main(ip_address):
     )
     frame_count = 0
     while True:
-        img_path = img_handler.capture_webcam_frame(frame_count)
-        response = coffee_assistant.get_response(client, img_path, user_response, )
+        image = img_handler.capture_webcam_frame(frame_count)
+        response = coffee_assistant.get_response(client, image, user_response)
         print(response)
         user_response = input("Escreva sua resposta:\n")
         frame_count += 1
 
-    thread_show_webcam.join()
+    process_show_webcam.join()
 
 
 if __name__ == "__main__":

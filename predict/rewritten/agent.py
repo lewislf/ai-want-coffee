@@ -1,6 +1,5 @@
 from typing import List
 from openai import Client
-from image import encode_image
 
 
 class GPTAgent():
@@ -31,13 +30,12 @@ class GPTVisionAgent(GPTAgent):
         self.image_history_rule = image_history_rule
 
 
-    def get_response(self, client: Client, image_path: str = "", text: str = ""):
-        base64_image = encode_image(image_path)
+    def get_response(self, client: Client, image, text: str = ""):
         user_response = [
             {"type": "image_url",
              "image_url":
              {
-                 "url": f"data:image/jpeg;base64,{base64_image}",
+                 "url": f"data:image/jpeg;base64,{image}",
                  "detail": "low",
              },
              },
@@ -46,7 +44,7 @@ class GPTVisionAgent(GPTAgent):
                 "text": text,
             }
         ]
-        super.add_user_response(user_response)
+        self.add_user_response(user_response)
         assistant_response = client.chat.completions.create(
             model=self.model,
             messages=self.history,
@@ -55,13 +53,13 @@ class GPTVisionAgent(GPTAgent):
         self.image_history_handler(text)
 
         text_response = assistant_response.choices[0].message.content
-        super.add_assistant_response(text_response)
+        self.add_assistant_response(text_response)
         return text_response
     
     def image_history_handler(self, text):
         if self.image_history_rule == 'none':
             self.history.pop()
-            super.add_user_response(text)
+            self.add_user_response(text)
 
 
 class GPTTextAgent(GPTAgent):
@@ -69,12 +67,12 @@ class GPTTextAgent(GPTAgent):
         super().__init__(system_prompt, model)
 
     def get_response(self, client, text: str = ""):
-        super.add_user_response(text)
+        self.add_user_response(text)
         assistant_response = client.chat.completions.create(
             model=self.model,
             messages=self.history,
             max_tokens=300,
         )
         text_response = assistant_response.choices[0].message.content
-        super.add_assistant_response(text_response)
+        self.add_assistant_response(text_response)
         return text_response
