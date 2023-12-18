@@ -9,19 +9,8 @@ from api_key import OPENAI_API_KEY
 def encode_image(image_path:str):
     with open(image_path, "rb") as image_file:
         return base64.b64encode(image_file.read()).decode('utf-8')
-    
-def ask_gpt_3_5(text):
-
-    client = openai.OpenAI(api_key=OPENAI_API_KEY)
-
-    response = client.completions.create(
-    model="gpt-3.5-turbo-instruct",
-    prompt="Write a tagline for an ice cream shop."
-    )
-    
-    return response.choices[0].text
         
-def ask_gpt_vision(payload):
+def ask_gpt(payload):
     
     headers = {
         "Content-Type": "application/json",

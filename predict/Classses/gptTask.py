@@ -1,8 +1,5 @@
-import openai
-
-from config import PROMPT_INI,FIRST_ANSWER
-from api_key import OPENAI_API_KEY
-from utils import encode_image, ask_gpt_3_5, ask_gpt_vision
+from config import PROMPT_INI,FIRST_ANSWER, MODE
+from utils import encode_image, ask_gpt
 
 
 class TaskManager:
@@ -11,33 +8,73 @@ class TaskManager:
         self.task_atual = ""
         self.contador = 0
         
-    def isYes(self,text):
-        texto = f"""Analyze the task and user response. If the user response indicates a positive affirmation summarize the response as 'yes'. If not, summarize the response as 'no'.
-        User response: {text}
-        """
-
-        return ask_gpt_3_5(texto)
+    def task_concluida(self, resposta):
+        prompt = {
+        "model": "gpt-4-1106-preview",
+        "messages": [
+            {
+                'role': 'system', 
+                'content': (
+                    "Com base na resposta do usuário, diga 'yes' se a tarefa descrita foi concluida e 'no' se não foi concluida"
+                    f"Task: {self.task_atual}"
+                    f"Resposta do usuario: {resposta}"
+                )
+            },
+        ],
+        "max_tokens": 150
+    }
+        conclusao = ask_gpt(prompt)
+        print(conclusao)
+        return conclusao
         
     def get_task(self,response, img_path):
-    
-        resposta = {
-                'role': 'user', 
-                'content': [(f"{response}, segue imagem do meu local: ")]
+        if MODE == "NEGATIVE":
+            if self.task_concluida(response):
+                resposta = {
+                    'role': 'user', 
+                    'content': [(f"{response}")]
+                    }
+                self.contador +=1
+                self.conversa["messages"].append(resposta)
+            else:
+                print("Image added")
+                resposta = {
+                    'role': 'user', 
+                    'content': [(f"{response}, segue imagem do meu local: ")]
+                    }
+                self.contador +=1
+                self.conversa["messages"].append(resposta)
+                
+                img = encode_image(img_path)
+                img_info = {
+                "type": "image_url",
+                "image_url": {
+                "url": f"data:image/jpeg;base64,{img}" ,
+                "detail": "low"
                 }
-        self.contador +=1
-        self.conversa["messages"].append(resposta)
-        
-        img = encode_image(img_path)
-        img_info = {
-        "type": "image_url",
-        "image_url": {
-        "url": f"data:image/jpeg;base64,{img}" ,
-        "detail": "low"
-        }
-        }
-        self.conversa["messages"][self.contador]["content"].append(img_info)
+                }
+                self.conversa["messages"][self.contador]["content"].append(img_info)
+                    
+        elif MODE == "ALL":
+            print("Image added2")
+            resposta = {
+                    'role': 'user', 
+                    'content': [(f"{response}, segue imagem do meu local: ")]
+                    }
+            self.contador +=1
+            self.conversa["messages"].append(resposta)
+            
+            img = encode_image(img_path)
+            img_info = {
+            "type": "image_url",
+            "image_url": {
+            "url": f"data:image/jpeg;base64,{img}" ,
+            "detail": "low"
+            }
+            }
+            self.conversa["messages"][self.contador]["content"].append(img_info)
 
-        self.task_atual = ask_gpt_vision(self.conversa)
+        self.task_atual = ask_gpt(self.conversa)
     
         task = {
                     'role': 'system', 
@@ -54,7 +91,7 @@ class TaskManager:
         self.contador +=1
         self.conversa["messages"].append(resposta)
 
-        self.task_atual = ask_gpt_vision(self.conversa)
+        self.task_atual = ask_gpt(self.conversa)
     
         task = {
                     'role': 'system', 

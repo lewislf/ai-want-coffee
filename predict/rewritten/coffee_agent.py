@@ -35,7 +35,7 @@ system_prompt = (
 
 def main():
     global system_prompt
-    client = OpenAI()
+    client = OpenAI(api_key="")
     coffee_agent = GPTVisionAgent(system_prompt, "gpt-4-vision-preview")
 
     user_input = input("ENTER para continuar")

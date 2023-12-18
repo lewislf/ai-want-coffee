@@ -1,3 +1,7 @@
+"""
+Modos disponíveis: ALL (tira foto toda task), NEGATIVE (manda foto apenas quando é dada uma resposta que indica que a task não foi completa)
+"""
+MODE = "NEGATIVE"
 PROMPT_INI = {
         "model": "gpt-4-vision-preview",
         "messages": [
@@ -12,7 +16,7 @@ PROMPT_INI = {
                     "Você deve ser capaz de guiar um usuário que nunca preparou café antes,"
                     "sempre pergunte se o usuário tem o item necessário para a tarefa e se o item é próprio para a tarefa,"
                     "só prossiga com a tarefa se o usuário confirmar que tem o item."                                    
-                    "Suas instruções serão claras e diretas, não mais do que uma tarefa por vez e limite de 100 caracteres por tarefa. "
+                    "Suas instruções serão claras e dçiretas, não mais do que uma tarefa por vez e limite de 100 caracteres por tarefa. "
                     "Toda vez que o usuário tiver dificuldade com uma tarefa, será enviada uma foto, analise-a e com base na foto de sugestões para ajudar o usuário"
                     "Só prossiga se o usuário indicar que conseguiu concluir a tarefa"
                     "Exemplos de interações:" 

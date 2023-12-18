@@ -4,10 +4,12 @@ import numpy as np
 import threading
 from time import sleep
 from unidecode import unidecode
-from predict.api_key import OPENAI_API_KEY
-from predict.api_key import LOCAL_CAMERA
+from api_key import OPENAI_API_KEY
+from api_key import LOCAL_CAMERA
 import openai
 from gpt4vision import *
+
+print(LOCAL_CAMERA)
 
 ########################################################################################################################
 ########################################################################################################################
