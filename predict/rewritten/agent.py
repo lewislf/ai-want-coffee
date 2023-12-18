@@ -24,8 +24,12 @@ class GPTAgent():
 
 
 class GPTVisionAgent(GPTAgent):
-    def __init__(self, system_prompt: str, model: str = "gpt-4-vision-preview") -> None:
+    image_history_rule: str
+    def __init__(self, system_prompt: str, model: str = "gpt-4-vision-preview", image_history_rule: str = "all") -> None:
         super().__init__(system_prompt, model)
+        assert image_history_rule in ['all', 'none']
+        self.image_history_rule = image_history_rule
+
 
     def get_response(self, client: Client, image_path: str = "", text: str = ""):
         base64_image = encode_image(image_path)
@@ -48,9 +52,16 @@ class GPTVisionAgent(GPTAgent):
             messages=self.history,
             max_tokens=300,
         )
+        self.image_history_handler(text)
+
         text_response = assistant_response.choices[0].message.content
         super.add_assistant_response(text_response)
         return text_response
+    
+    def image_history_handler(self, text):
+        if self.image_history_rule == 'none':
+            self.history.pop()
+            super.add_user_response(text)
 
 
 class GPTTextAgent(GPTAgent):

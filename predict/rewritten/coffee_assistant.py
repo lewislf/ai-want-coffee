@@ -2,7 +2,7 @@ from openai import OpenAI
 import threading
 import argparse
 import cv2
-from agent import GPTTextAgent
+from agent import GPTVisionAgent
 from image_handler import ImageHandler
 
 
@@ -28,7 +28,7 @@ system_prmpt = (
 def main(ip_address):
     global system_prompt
     client = OpenAI()
-    coffee_agent = GPTTextAgent(system_prompt, "gpt-3.5-turbo")
+    coffee_assistant = GPTVisionAgent(system_prompt, "gpt-4-vision-preview")
     cap = cv2.VideoCapture(ip_address)
     img_handler = ImageHandler(cap)
 
@@ -39,10 +39,13 @@ def main(ip_address):
         "Eu irei fazer uma demo testando através de imagens na tela do meu computador, considere-as como" 
         "'reais' para fins de teste. Me pergunte se podemos iniciar"
     )
-    
+    frame_count = 0
     while True:
-        response = coffee_agent.get_response(client, user_response)
-        
+        img_path = img_handler.capture_webcam_frame(frame_count)
+        response = coffee_assistant.get_response(client, img_path, user_response, )
+        print(response)
+        user_response = input("Escreva sua resposta:\n")
+        frame_count += 1
 
     thread_show_webcam.join()
 
