@@ -28,7 +28,7 @@ Tests were conducted in different kitchens, for testing in different scenarios u
 ### Visualization  **adicionar imagens**
 <div align="center"><td><img src=data/sample_videos/1+DEMO+AGI+COFFEE.gif></td></div>
 
-[Video Demo](https://thumbnail_image_url.jpg)](https://streamable.com/bfa5wy)
+<a href="https://streamable.com/bfa5wy">[Video Demo]</a>
 
 
 # Installation
