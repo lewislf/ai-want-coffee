@@ -28,7 +28,7 @@ Tests were conducted in different kitchens, for testing in different scenarios u
 ### Visualization  **adicionar imagens**
 <div align="center"><td><img src=data/sample_videos/1+DEMO+AGI+COFFEE.gif></td></div>
 
-[![Video Demo](https://thumbnail_image_url.jpg)](https://streamable.com/bfa5wy)
+<a href="https://streamable.com/bfa5wy">[Video Demo]</a>
 
 
 # Installation
@@ -81,10 +81,10 @@ LOCAL_CAMERA = "rtsp://ip:port/h264_ulaw.sdp"
 # ai-want-coffee/predict/
 cd ai-want-coffee/predict/
 ```
-- In the terminal, execute python gpt.py
+- In the terminal, execute python assistant_gpt.py
 ```shell
 # Navigate to the ai-want-coffee repository and execute the following:
-python3 gpt.py
+python3 assistant_gpt.py
 ```
 
 
