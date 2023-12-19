@@ -75,16 +75,35 @@ LOCAL_CAMERA = "rtsp://ip:port/h264_ulaw.sdp"
 ```
 
 ## 4. Execution
-### 1. Run the Script:
+### 1. Run the Script - Coffee-Agent:
+- Replace the prompt in the *gpt4vision.py* file with the *AgentLegacy.py* prompt
 - Open de folder **predict**:
  ```shell
-# ai-want-coffee/predict/
 cd ai-want-coffee/predict/
 ```
 - In the terminal, execute python assistant_gpt.py
 ```shell
-# Navigate to the ai-want-coffee repository and execute the following:
 python3 assistant_gpt.py
+```
+### 2. Run the Script - Coffee-Assistant:
+- Replace the prompt in the *gpt4vision.py* file with the *AgentLegacy.py* prompt
+- Open de folder **predict/classes**:
+ ```shell
+cd ai-want-coffee/predict/Classes
+```
+- In the terminal, execute python assistant_gpt.py
+```shell
+python3 main.py
+```
+### 3. Run the Script - Coffee-Agent v2:
+- Replace the prompt in the *gpt4vision.py* file with the *AgentLegacy.py* prompt
+- Open de folder **predict/assistant-v2**:
+ ```shell
+cd ai-want-coffee/predict/assistant-v2
+```
+- In the terminal, execute python assistant_gpt.py
+```shell
+python3 gpt.py
 ```
 
 
