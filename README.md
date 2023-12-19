@@ -6,7 +6,8 @@
 
   Alefe Gadioli, Breno de Angelo, Daniel Gobbi, Eduardo Abreu, Luiz Cardoso, Mariana Rezende e Matheus Rezende
 <!-- <a href="https://scholar.google.com/citations?user=pCY-bikAAAAJ&hl=zh-CN">Jinwei Yuan</a> -->
-<div><a href="https://arxiv.org/abs/2208.11434">[AI Want Coffee Report]</a></div> 
+<div><a href="https://drive.google.com/file/d/1EsYGXENzJfzaMS3ItD7APvyZtTvq52aQ/view?usp=sharing">[AI Want Coffee Report]</a></div> 
+
 
 </div>
 
