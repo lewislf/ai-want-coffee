@@ -42,13 +42,8 @@ def main():
     coffee_assistant = GPTVisionAgent(system_prompt=system_prompt,
                                       model="gpt-4-vision-preview",
                                       image_history_rule='none')
-    user_response = (
-        "Eu irei fazer uma demo testando através de imagens na tela do meu computador, considere-as como"
-        "'reais' para fins de teste. Me pergunte se podemos iniciar"
-    )
-    frame_count = 0
     while True:
-        user_response = input("teste")  # Wait for user response from the main process
+        user_response = input("User: ")
         for i in range(3):
             sleep(0.75)
             print(f"Capturing frame in {3 - i}...")
@@ -56,8 +51,7 @@ def main():
         frame_captured_event.wait()
         image = queue.get()
         response = coffee_assistant.get_response(client, image, user_response)
-        print(response)
-        frame_count += 1
+        print("Assistant: " + response)
 
 
 if __name__ == "__main__":
