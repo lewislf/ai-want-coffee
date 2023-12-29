@@ -5,8 +5,6 @@ import argparse
 from agent import GPTVisionAgent
 from image_handler import ImageHandler
 from time import sleep
-from cv2 import waitKey
-
 
 system_prompt = (
     "Você se chama Clio e é uma Inteligência Computacional Autônoma (ICA) "
@@ -26,36 +24,55 @@ system_prompt = (
     "(EXEMPLO)'user': 'Passo concluído.'; 'system': 'Coloque água no recipiente'\n"
 )
 
-
 def show_webcam():
     camera_handler = ImageHandler(ip_address)
-    while True:
+    while not end_program.is_set():
         if capture_frame_event.is_set():
             capture_frame_event.clear()
-            queue.put(camera_handler.capture_webcam_frame())
+            queue_img.put(camera_handler.capture_webcam_frame())
             frame_captured_event.set()
+        if has_new_text.is_set():
+            has_new_text.clear()
+            new_task = queue_text.get()
+            camera_handler.update_task(new_task)
+        if camera_handler.encerrado:
+            end_program.set()
         camera_handler.show_webcam()
+        
         
 
 def main():
-    client = OpenAI()
+    client = OpenAI(api_key="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")
     coffee_assistant = GPTVisionAgent(system_prompt=system_prompt,
                                       model="gpt-4-vision-preview",
                                       image_history_rule='none')
-    while True:
+    while not end_program.is_set():
         user_response = input("User: ")
-        for i in range(3):
-            sleep(0.75)
-            print(f"Capturing frame in {3 - i}...")
-        capture_frame_event.set()
-        frame_captured_event.wait()
-        image = queue.get()
-        response = coffee_assistant.get_response(client, image, user_response)
-        print("Assistant: " + response)
+        
+        if not end_program.is_set():
+            for i in range(3):
+                text = f"Capturing frame in {3 - i}..."
+                print(text)
+                has_new_text.set()
+                queue_text.put(text)
+                sleep(0.75)
+          
+        if not end_program.is_set():
+            capture_frame_event.set()
+            frame_captured_event.wait()
+            has_new_text.set()
+            queue_text.put("Frame salvo! esperando resposta... ")
+            
+        if not end_program.is_set():
+            image = queue_img.get()
+            task = coffee_assistant.get_response(client, image, user_response)
+            has_new_text.set()
+            queue_text.put(task)
+            print("Assistant: " + task)
 
 
 if __name__ == "__main__":
-
+    
     parser = argparse.ArgumentParser(
         description="A program that does something.")
     parser.add_argument('ip_address', type=str,
@@ -65,11 +82,13 @@ if __name__ == "__main__":
 
     capture_frame_event = Event()
     frame_captured_event = Event()
-    queue = Queue()
+    has_new_text = Event()
+    end_program = Event()
+    queue_img = Queue()
+    queue_text = Queue()
 
     thread_show_webcam = Thread(target=show_webcam)
     thread_show_webcam.start()
 
     main()
 
-    thread_show_webcam.join()

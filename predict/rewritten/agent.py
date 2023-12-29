@@ -1,7 +1,6 @@
 from typing import List
 from openai import Client
 
-
 class GPTAgent():
 
     history: List
